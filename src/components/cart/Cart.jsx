@@ -7,10 +7,24 @@ import {
   increaseQuantity,
 } from "../../rtk/slices/amazonSlice";
 import EmptyCart from "./EmptyCart";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useEffect } from "react";
 const Cart = () => {
   const productsCart = useSelector((state) => state.amazon.products);
-  // console.log(productsCart);
+  const userInfo = useSelector((state) => state.amazon.userInfo);
+
   const dispatch = useDispatch();
+
+  const updateCart = async () => {
+    await setDoc(doc(db, "cart", userInfo.userId), { productsCart });
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      updateCart();
+    }
+  }, [productsCart]);
 
   return (
     <div className=" min-h-[60vh] overflow-y-hidden">

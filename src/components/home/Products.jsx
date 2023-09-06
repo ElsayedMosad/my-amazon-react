@@ -1,14 +1,43 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useLoaderData } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import StarIcon from "@mui/icons-material/Star";
 import ApiIcon from "@mui/icons-material/Api";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { addToCart } from "../../rtk/slices/amazonSlice";
+import { addToCart, setCartProducts } from "../../rtk/slices/amazonSlice";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useEffect } from "react";
 const Products = () => {
+  const productsCart = useSelector((state) => state.amazon.products);
+  const userInfo = useSelector((state) => state.amazon.userInfo);
+
   const products = useLoaderData();
   const dispatch = useDispatch();
+
+  const updateCart = async () => {
+    await setDoc(doc(db, "cart", userInfo.userId), { productsCart });
+  };
+  useEffect(() => {
+    if (userInfo) {
+      updateCart();
+    }
+  }, [productsCart]);
+
+  const fetchCartFirebase = async () => {
+    const docRef = doc(db, "cart", userInfo.userId);
+    const docSnap = await getDoc(docRef);
+    dispatch(setCartProducts(docSnap.data().productsCart));
+    console.log(docSnap.data().productsCart);
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      fetchCartFirebase();
+    }
+  }, []);
   return (
     <div className=" grid gap-6 p-4 grid-cols-[repeat(auto-fit,minmax(270px,1fr))] bg-gray-100">
       {products &&
