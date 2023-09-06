@@ -74,11 +74,9 @@ const Register = () => {
       password.length >= 6 &&
       rePassword === password
     ) {
-      // console.log(userName, email, password, rePassword);
       setLoading(true);
       createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
+        .then(() => {
           updateProfile(auth.currentUser, {
             displayName: userName,
             photoURL:
@@ -93,7 +91,6 @@ const Register = () => {
               // An error occurred
               // ...
             });
-          console.log(user);
           setLoading(false);
           setUserName("");
           setEmail("");
@@ -106,7 +103,6 @@ const Register = () => {
         })
         .catch((error) => {
           const errorCode = error.code;
-          // console.log(errorCode);
           const errorMessage = error.message;
           console.log(errorMessage);
           if (errorCode.includes("auth/email-already-in-use")) {

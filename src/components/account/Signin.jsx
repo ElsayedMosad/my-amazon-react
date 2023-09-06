@@ -51,7 +51,6 @@ const Signin = () => {
       setErrorPassword("Enter a valid password");
     }
     if (isValidEmail(email) && password.length >= 6) {
-      // console.log(email, password);
       setLoading(true);
 
       signInWithEmailAndPassword(auth, email, password)
@@ -75,7 +74,6 @@ const Signin = () => {
         })
         .catch((error) => {
           const errorCode = error.code;
-          // console.log(errorCode);
           const errorMessage = error.message;
           console.log(errorMessage);
           setLoading(false);
