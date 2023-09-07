@@ -11,6 +11,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import userReducer from "./slices/userSlice";
 
 const persistConfig = {
   key: "root",
@@ -18,10 +19,15 @@ const persistConfig = {
   storage,
 };
 
-const amazonPersistReducer = persistReducer(persistConfig, amazonReducer);
+// const amazonPersistReducer = persistReducer(persistConfig, amazonReducer);
+const amazonPersistReducer = persistReducer(persistConfig, userReducer);
 
 export const store = configureStore({
-  reducer: { amazon: amazonPersistReducer },
+  reducer: {
+    amazon: amazonReducer,
+    userReducer: amazonPersistReducer
+  },
+  // reducer: { amazon: amazonPersistReducer },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

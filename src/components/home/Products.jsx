@@ -1,14 +1,63 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useLoaderData } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import StarIcon from "@mui/icons-material/Star";
 import ApiIcon from "@mui/icons-material/Api";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { addToCart } from "../../rtk/slices/amazonSlice";
+import { addToCart, setCartProducts } from "../../rtk/slices/amazonSlice";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useEffect } from "react";
+
 const Products = () => {
+  const userInfo = useSelector((state) => state.userReducer.userInfo);
+  const productsCart = useSelector((state) => state.amazon.products);
+
+  const editDatabaseFromProducts = (data) => {
+    let allProductsCart = productsCart;
+    if (userInfo) {
+      const findIndex = allProductsCart.findIndex(
+        (element) => element.id === data.id
+      );
+      if (findIndex === -1) {
+        allProductsCart = [...productsCart, { ...data, quantity: 1 }];
+      } else {
+        allProductsCart = allProductsCart.map((ele) => {
+          if (ele.id === data.id) {
+            return { ...ele, quantity: ele.quantity + 1 };
+          } else {
+            return ele;
+          }
+        });
+      }
+      const editDocCartFirebase = async () => {
+        await setDoc(doc(db, "cart", userInfo.userId), {
+          myProductsCart: allProductsCart,
+        });
+      };
+      if (userInfo) {
+        editDocCartFirebase();
+      }
+    }
+  };
+
   const products = useLoaderData();
   const dispatch = useDispatch();
+
+  const fetchCartFirebase = async () => {
+    if (userInfo) {
+      const docRef = doc(db, "cart", userInfo.userId);
+      const docSnap = await getDoc(docRef);
+      dispatch(setCartProducts(docSnap.data().myProductsCart));
+      return docSnap.data().productsCart;
+    }
+  };
+  useEffect(() => {
+    fetchCartFirebase();
+  }, []);
+
   return (
     <div className=" grid gap-6 p-4 grid-cols-[repeat(auto-fit,minmax(270px,1fr))] bg-gray-100">
       {products &&
@@ -22,7 +71,6 @@ const Products = () => {
             </span>
             <div className="flex items-center justify-center p-7 relative group ">
               <img
-                // src={product.images[0]}
                 src={product.image}
                 alt="product cart"
                 className="object-contain h-56 	"
@@ -69,7 +117,10 @@ const Products = () => {
               </div>
               <button
                 className="w-full text-black my-2 rounded-md font-medium text-center p-2 bg-gradient-to-tr from-yellow-400 to-yellow-200  hover:from-yellow-300 to hover:to-yellow-400 active:from-yellow-400  active:to-yellow-500 border border-yellow-500 hover:border-yellow-600 duration-200 cursor-pointer"
-                onClick={() => dispatch(addToCart(product))}
+                onClick={() => {
+                  dispatch(addToCart(product));
+                  editDatabaseFromProducts(product);
+                }}
               >
                 Add to cart
               </button>

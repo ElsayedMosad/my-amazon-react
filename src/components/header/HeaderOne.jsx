@@ -10,12 +10,12 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
-import { signOutUser } from "../../rtk/slices/amazonSlice";
+import { signOutUser } from "../../rtk/slices/userSlice";
 
 const HeaderOne = () => {
   const [showItem, setShowItem] = useState(false);
   const products = useSelector((state) => state.amazon.products);
-  const userInfo = useSelector((state) => state.amazon.userInfo);
+  const userInfo = useSelector((state) => state.userReducer.userInfo);
   const dispatch = useDispatch();
 
   const handleSignOut = () => {
@@ -124,6 +124,7 @@ const HeaderOne = () => {
           <p className=" text-xs -mb-3 -ml-1 font-medium	">Cart</p>
           <span className=" absolute -top-1 left-[50%] -translate-x-1/2 bg-amazonYellow text-amazonBlue rounded-full w-4 h-4 text-[10px] font-semibold flex items-center justify-center">
             {products.length > 99 ? 99 : products.length}
+            {/* 00 */}
           </span>
         </div>
       </Link>

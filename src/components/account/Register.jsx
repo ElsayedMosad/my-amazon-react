@@ -7,9 +7,10 @@ import CopyRight from "./CopyRight";
 import { useState } from "react";
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase";
 
 import { ThreeDots } from "react-loader-spinner";
+import { doc, setDoc } from "firebase/firestore";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -76,7 +77,17 @@ const Register = () => {
     ) {
       setLoading(true);
       createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
+        .then((userCredential) => {
+          const user = userCredential.user;
+          const editDocCartFirebase = async () => {
+            await setDoc(doc(db, "cart", user.uid), {
+              myProductsCart: [],
+            });
+          };
+          editDocCartFirebase();
+          // console.log(user.uid);
+          // console.log(user.uid);
+
           updateProfile(auth.currentUser, {
             displayName: userName,
             photoURL:
@@ -91,6 +102,13 @@ const Register = () => {
               // An error occurred
               // ...
             });
+          //   const editDocCartFirebase = async () => {
+          //   await setDoc(doc(db, "cart", ""), {
+          //     myProductsCart: null,
+          //   });
+          // };
+          // editDocCartFirebase()
+
           setLoading(false);
           setUserName("");
           setEmail("");

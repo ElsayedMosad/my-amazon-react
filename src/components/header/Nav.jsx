@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Nav = () => {
-  const userInfo = useSelector((state) => state.amazon.userInfo);
+  const userInfo = useSelector((state) => state.userReducer.userInfo);
 
   const [showMenu, setShowMenu] = useState(false);
   const ref = useRef();

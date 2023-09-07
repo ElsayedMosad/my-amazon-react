@@ -8,7 +8,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 import { ThreeDots } from "react-loader-spinner";
 import { useDispatch } from "react-redux";
-import { setUserInfo } from "../../rtk/slices/amazonSlice";
+import { setUserInfo } from "../../rtk/slices/userSlice";
+// import { setUserInfo } from "../../rtk/slices/amazonSlice";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ const Signin = () => {
               userImage: user.photoURL,
             })
           );
+
           setLoading(false);
           setMsgAccount("Sign in Successfully! Welcome you back!");
           setTimeout(() => {
