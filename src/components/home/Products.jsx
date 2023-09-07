@@ -6,58 +6,10 @@ import ApiIcon from "@mui/icons-material/Api";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { addToCart, setCartProducts } from "../../rtk/slices/amazonSlice";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../../firebase";
-import { useEffect } from "react";
-
+import { addToCart } from "../../rtk/slices/amazonSlice";
 const Products = () => {
-  const userInfo = useSelector((state) => state.userReducer.userInfo);
-  const productsCart = useSelector((state) => state.amazon.products);
-
-  const editDatabaseFromProducts = (data) => {
-    let allProductsCart = productsCart;
-    if (userInfo) {
-      const findIndex = allProductsCart.findIndex(
-        (element) => element.id === data.id
-      );
-      if (findIndex === -1) {
-        allProductsCart = [...productsCart, { ...data, quantity: 1 }];
-      } else {
-        allProductsCart = allProductsCart.map((ele) => {
-          if (ele.id === data.id) {
-            return { ...ele, quantity: ele.quantity + 1 };
-          } else {
-            return ele;
-          }
-        });
-      }
-      const editDocCartFirebase = async () => {
-        await setDoc(doc(db, "cart", userInfo.userId), {
-          myProductsCart: allProductsCart,
-        });
-      };
-      if (userInfo) {
-        editDocCartFirebase();
-      }
-    }
-  };
-
   const products = useLoaderData();
   const dispatch = useDispatch();
-
-  const fetchCartFirebase = async () => {
-    if (userInfo) {
-      const docRef = doc(db, "cart", userInfo.userId);
-      const docSnap = await getDoc(docRef);
-      dispatch(setCartProducts(docSnap.data().myProductsCart));
-      return docSnap.data().productsCart;
-    }
-  };
-  useEffect(() => {
-    fetchCartFirebase();
-  }, []);
-
   return (
     <div className=" grid gap-6 p-4 grid-cols-[repeat(auto-fit,minmax(270px,1fr))] bg-gray-100">
       {products &&
